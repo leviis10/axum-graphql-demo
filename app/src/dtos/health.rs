@@ -1,3 +1,3 @@
-pub mod health_response;
+mod health_response;
 
 pub use health_response::HealthResponse;
