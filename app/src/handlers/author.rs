@@ -1,8 +1,9 @@
-use crate::dtos::author::CreateAuthorRequest;
+use crate::dtos::author::{CreateAuthorRequest, UpdateAuthorRequest};
 use crate::entities::authors;
 use crate::errors::{AppError, Result};
 use crate::repositories;
-use sea_orm::{ActiveValue, DatabaseConnection};
+use sea_orm::{ActiveValue, DatabaseConnection, IntoActiveModel};
+use time::OffsetDateTime;
 
 pub async fn create(
     db: &DatabaseConnection,
@@ -26,4 +27,25 @@ pub async fn get_by_id(db: &DatabaseConnection, id: i32) -> Result<authors::Mode
 
 pub async fn find_authors(db: &DatabaseConnection) -> Result<Vec<authors::Model>> {
     repositories::author::find_all(db).await
+}
+
+pub async fn update_by_id(
+    db: &DatabaseConnection,
+    id: i32,
+    request: UpdateAuthorRequest,
+) -> Result<authors::Model> {
+    let mut found_author = get_by_id(db, id).await?.into_active_model();
+    found_author.name = ActiveValue::Set(request.name);
+    found_author.updated_at = ActiveValue::Set(OffsetDateTime::now_utc());
+
+    let updated_author = repositories::author::save(db, found_author).await?;
+    Ok(updated_author)
+}
+
+pub async fn delete_by_id(db: &DatabaseConnection, id: i32) -> Result<()> {
+    let found_author = get_by_id(db, id).await?;
+
+    repositories::author::delete(db, found_author).await?;
+
+    Ok(())
 }

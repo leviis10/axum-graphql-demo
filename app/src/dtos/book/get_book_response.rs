@@ -42,7 +42,7 @@ impl TryFrom<books::Model> for GetBookResponse {
 
     fn try_from(model: books::Model) -> Result<Self> {
         Ok(GetBookResponse {
-            id: ID(model.id.to_string()),
+            id: ID::from(model.id),
             author_id: model.author_id,
             title: model.title,
             published_year: model.published_year,

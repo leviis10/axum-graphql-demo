@@ -1,7 +1,7 @@
 use crate::entities::authors;
 use crate::entities::prelude::Authors;
 use crate::errors::Result;
-use sea_orm::{ActiveModelTrait, ConnectionTrait, EntityTrait, TryIntoModel};
+use sea_orm::{ActiveModelTrait, ConnectionTrait, EntityTrait, ModelTrait, TryIntoModel};
 
 pub async fn save(
     connection: &impl ConnectionTrait,
@@ -25,4 +25,10 @@ pub async fn find_all(connection: &impl ConnectionTrait) -> Result<Vec<authors::
     let found_authors = Authors::find().all(connection).await?;
 
     Ok(found_authors)
+}
+
+pub async fn delete(connection: &impl ConnectionTrait, model: authors::Model) -> Result<()> {
+    model.delete(connection).await?;
+
+    Ok(())
 }

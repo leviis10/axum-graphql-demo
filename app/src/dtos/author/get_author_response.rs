@@ -38,7 +38,7 @@ impl TryFrom<authors::Model> for GetAuthorResponse {
 
     fn try_from(model: authors::Model) -> Result<Self> {
         Ok(GetAuthorResponse {
-            id: ID(model.id.to_string()),
+            id: ID::from(model.id),
             name: model.name,
             created_at: model.created_at.format(&Rfc3339)?,
             updated_at: model.updated_at.format(&Rfc3339)?,
