@@ -1,6 +1,9 @@
 use crate::dtos::author::{
     CreateAuthorRequest, CreateAuthorResponse, UpdateAuthorRequest, UpdateAuthorResponse,
 };
+use crate::dtos::book::{
+    CreateBookRequest, CreateBookResponse, UpdateBookRequest, UpdateBookResponse,
+};
 use crate::errors::Result;
 use crate::handlers;
 use async_graphql::{Context, ID, Object};
@@ -40,6 +43,37 @@ impl Mutation {
 
         handlers::author::delete_by_id(db, id.parse()?).await?;
 
+        Ok(true)
+    }
+
+    async fn create_book<'ctx>(
+        &self,
+        ctx: &Context<'ctx>,
+        request: CreateBookRequest,
+    ) -> Result<CreateBookResponse> {
+        let db = ctx.data::<DatabaseConnection>()?;
+
+        let new_book = handlers::book::create(db, request).await?;
+
+        CreateBookResponse::try_from(new_book)
+    }
+
+    async fn update_book_by_id(
+        &self,
+        ctx: &Context<'_>,
+        id: i32,
+        request: UpdateBookRequest,
+    ) -> Result<UpdateBookResponse> {
+        let db: &DatabaseConnection = ctx.data()?;
+
+        let updated_book = handlers::book::update_by_id(db, id, request).await?;
+        UpdateBookResponse::try_from(updated_book)
+    }
+
+    async fn delete_book_by_id(&self, ctx: &Context<'_>, id: ID) -> Result<bool> {
+        let db: &DatabaseConnection = ctx.data()?;
+
+        handlers::book::delete_by_id(db, id.parse()?).await?;
         Ok(true)
     }
 }
