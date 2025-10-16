@@ -1,9 +1,12 @@
 use crate::AppState;
 use async_graphql::Request;
+#[cfg(debug_assertions)]
 use async_graphql::http::GraphiQLSource;
 use axum::Json;
 use axum::extract::State;
-use axum::response::{Html, IntoResponse};
+#[cfg(debug_assertions)]
+use axum::response::Html;
+use axum::response::IntoResponse;
 use std::sync::Arc;
 
 #[cfg(debug_assertions)]

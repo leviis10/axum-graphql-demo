@@ -1,3 +1,6 @@
+use crate::dtos::auth::{
+    LoginRequest, LoginResponse, RefreshTokenResponse, RegisterUserRequest, RegisterUserResponse,
+};
 use crate::dtos::author::{
     CreateAuthorRequest, CreateAuthorResponse, UpdateAuthorRequest, UpdateAuthorResponse,
 };
@@ -75,5 +78,33 @@ impl Mutation {
 
         handlers::book::delete_by_id(db, id.parse()?).await?;
         Ok(true)
+    }
+
+    async fn register_user(
+        &self,
+        ctx: &Context<'_>,
+        request: RegisterUserRequest,
+    ) -> Result<RegisterUserResponse> {
+        let db: &DatabaseConnection = ctx.data()?;
+
+        let registered_user = handlers::auth::register(db, request).await?;
+
+        RegisterUserResponse::try_from(registered_user)
+    }
+
+    async fn login(&self, ctx: &Context<'_>, request: LoginRequest) -> Result<LoginResponse> {
+        let db: &DatabaseConnection = ctx.data()?;
+
+        handlers::auth::login(db, request).await
+    }
+
+    async fn refresh_token(
+        &self,
+        ctx: &Context<'_>,
+        refresh_token: String,
+    ) -> Result<RefreshTokenResponse> {
+        let db: &DatabaseConnection = ctx.data()?;
+
+        handlers::auth::refresh(db, &refresh_token).await
     }
 }

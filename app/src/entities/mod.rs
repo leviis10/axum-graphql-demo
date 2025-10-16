@@ -4,3 +4,7 @@ pub mod prelude;
 
 pub mod authors;
 pub mod books;
+pub mod refresh_tokens;
+pub mod roles;
+pub mod users;
+pub mod users_roles;

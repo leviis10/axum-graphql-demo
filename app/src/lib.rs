@@ -23,6 +23,7 @@ mod graphql;
 mod handlers;
 mod repositories;
 mod routes;
+mod utils;
 
 struct AppState {
     db: DatabaseConnection,

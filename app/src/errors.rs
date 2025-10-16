@@ -1,12 +1,15 @@
 use crate::dtos::global::ErrorResponse;
+use argon2::password_hash::Error as ArgonError;
 use async_graphql::Error as GraphQlError;
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
+use jsonwebtoken::errors::Error as JwtError;
 use sea_orm::DbErr;
 use serde::Serialize;
+use std::env::VarError;
 use std::fmt::{Display, Formatter};
 use std::num::ParseIntError;
-use time::error::Format as TimeFormatError;
+use time::error::{ComponentRange, Format as TimeFormatError};
 
 #[derive(Serialize)]
 pub enum ErrorCode {
@@ -15,6 +18,11 @@ pub enum ErrorCode {
     TimeFormatError,
     NotFound,
     ParseIntError,
+    ArgonError,
+    IncorrectCredentials,
+    VarError,
+    JwtError,
+    ComponentRange,
 }
 
 pub enum AppError {
@@ -23,6 +31,11 @@ pub enum AppError {
     TimeFormatError(TimeFormatError),
     NotFound(String),
     ParseIntError(ParseIntError),
+    ArgonError(ArgonError),
+    IncorrectCredentials(String),
+    VarError(VarError),
+    JwtError(JwtError),
+    ComponentRange(ComponentRange),
 }
 
 impl Display for AppError {
@@ -33,6 +46,11 @@ impl Display for AppError {
             AppError::TimeFormatError(err) => write!(f, "{}", err),
             AppError::NotFound(err) => write!(f, "{}", err),
             AppError::ParseIntError(err) => write!(f, "{}", err),
+            AppError::ArgonError(err) => write!(f, "{}", err),
+            AppError::IncorrectCredentials(err) => write!(f, "{}", err),
+            AppError::VarError(err) => write!(f, "{}", err),
+            AppError::JwtError(err) => write!(f, "{}", err),
+            AppError::ComponentRange(err) => write!(f, "{}", err),
         }
     }
 }
@@ -75,6 +93,41 @@ impl IntoResponse for AppError {
                     message: err.to_string(),
                 },
             ),
+            AppError::ArgonError(err) => (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                ErrorResponse {
+                    error_code: ErrorCode::ArgonError,
+                    message: err.to_string(),
+                },
+            ),
+            AppError::IncorrectCredentials(err) => (
+                StatusCode::UNAUTHORIZED,
+                ErrorResponse {
+                    error_code: ErrorCode::IncorrectCredentials,
+                    message: err,
+                },
+            ),
+            AppError::VarError(err) => (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                ErrorResponse {
+                    error_code: ErrorCode::VarError,
+                    message: err.to_string(),
+                },
+            ),
+            AppError::JwtError(err) => (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                ErrorResponse {
+                    error_code: ErrorCode::JwtError,
+                    message: err.to_string(),
+                },
+            ),
+            AppError::ComponentRange(err) => (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                ErrorResponse {
+                    error_code: ErrorCode::ComponentRange,
+                    message: err.to_string(),
+                },
+            ),
         };
 
         (status, response).into_response()
@@ -102,6 +155,30 @@ impl From<TimeFormatError> for AppError {
 impl From<ParseIntError> for AppError {
     fn from(err: ParseIntError) -> Self {
         AppError::ParseIntError(err)
+    }
+}
+
+impl From<ArgonError> for AppError {
+    fn from(err: ArgonError) -> Self {
+        AppError::ArgonError(err)
+    }
+}
+
+impl From<VarError> for AppError {
+    fn from(err: VarError) -> Self {
+        AppError::VarError(err)
+    }
+}
+
+impl From<JwtError> for AppError {
+    fn from(err: JwtError) -> Self {
+        AppError::JwtError(err)
+    }
+}
+
+impl From<ComponentRange> for AppError {
+    fn from(err: ComponentRange) -> Self {
+        AppError::ComponentRange(err)
     }
 }
 
