@@ -33,6 +33,18 @@ pub async fn find_all_by_author_id(
     Ok(found_books)
 }
 
+pub async fn find_all_by_author_id_in(
+    connection: &impl ConnectionTrait,
+    author_id: &[i32],
+) -> Result<Vec<books::Model>> {
+    let found_books = Books::find()
+        .filter(books::Column::AuthorId.is_in(Vec::from(author_id)))
+        .all(connection)
+        .await?;
+
+    Ok(found_books)
+}
+
 pub async fn delete(connection: &impl ConnectionTrait, model: books::Model) -> Result<bool> {
     model.delete(connection).await?;
     Ok(true)

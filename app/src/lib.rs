@@ -21,6 +21,7 @@ mod entities;
 mod errors;
 mod graphql;
 mod handlers;
+mod loaders;
 mod repositories;
 mod routes;
 mod utils;

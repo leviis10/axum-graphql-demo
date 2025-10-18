@@ -5,7 +5,7 @@ edition = "2024"
 
 [dependencies]
 argon2 = "0.5.3"
-async-graphql = "7.0.17"
+async-graphql = { version = "7.0.17", features = ["dataloader"] }
 axum = { version = "0.8.6", features = ["macros"] }
 hex = "0.4.3"
 jsonwebtoken = { version = "10.0.0", features = ["aws_lc_rs"] }

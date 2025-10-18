@@ -7,7 +7,7 @@ use async_graphql::{ComplexObject, Context, ID, SimpleObject};
 use sea_orm::DatabaseConnection;
 use time::format_description::well_known::Rfc3339;
 
-#[derive(SimpleObject)]
+#[derive(SimpleObject, Clone)]
 #[graphql(complex)]
 pub struct GetBookResponse {
     pub id: ID,

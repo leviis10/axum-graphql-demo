@@ -39,6 +39,13 @@ pub async fn find_all_by_author_id(
     repositories::book::find_all_by_author_id(db, author_id).await
 }
 
+pub async fn find_all_by_author_id_in(
+    db: &DatabaseConnection,
+    author_id: &[i32],
+) -> Result<Vec<books::Model>> {
+    repositories::book::find_all_by_author_id_in(db, author_id).await
+}
+
 pub async fn update_by_id(
     db: &DatabaseConnection,
     id: i32,

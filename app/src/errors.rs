@@ -36,6 +36,7 @@ pub enum AppError {
     VarError(VarError),
     JwtError(JwtError),
     ComponentRange(ComponentRange),
+    LoaderError(String),
 }
 
 impl Display for AppError {
@@ -51,6 +52,7 @@ impl Display for AppError {
             AppError::VarError(err) => write!(f, "{}", err),
             AppError::JwtError(err) => write!(f, "{}", err),
             AppError::ComponentRange(err) => write!(f, "{}", err),
+            AppError::LoaderError(err) => write!(f, "{}", err),
         }
     }
 }
@@ -126,6 +128,13 @@ impl IntoResponse for AppError {
                 ErrorResponse {
                     error_code: ErrorCode::ComponentRange,
                     message: err.to_string(),
+                },
+            ),
+            AppError::LoaderError(err) => (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                ErrorResponse {
+                    error_code: ErrorCode::ComponentRange,
+                    message: err,
                 },
             ),
         };

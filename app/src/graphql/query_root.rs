@@ -1,4 +1,4 @@
-use crate::dtos::author::GetAuthorResponse;
+use crate::dtos::author::{GetAuthorLoaderResponse, GetAuthorResponse};
 use crate::dtos::book::GetBookResponse;
 use crate::errors::Result;
 use crate::handlers;
@@ -25,6 +25,17 @@ impl QueryRoot {
         found_authors
             .into_iter()
             .map(GetAuthorResponse::try_from)
+            .collect()
+    }
+
+    async fn authors_loader(&self, ctx: &Context<'_>) -> Result<Vec<GetAuthorLoaderResponse>> {
+        let db = ctx.data::<DatabaseConnection>()?;
+
+        let found_authors = handlers::author::find_authors(db).await?;
+
+        found_authors
+            .into_iter()
+            .map(GetAuthorLoaderResponse::try_from)
             .collect()
     }
 
