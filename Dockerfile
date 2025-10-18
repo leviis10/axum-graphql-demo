@@ -3,7 +3,7 @@ WORKDIR /app
 COPY ./app .
 RUN cargo build --release
 
-FROM alpine:3.22.1
+FROM alpine:3.22.2
 WORKDIR /app
 COPY --from=builder /app/target/release/app .
 CMD ["./app"]
