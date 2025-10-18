@@ -1,5 +1,4 @@
-FROM rust:1.89.0-alpine3.22 AS builder
-RUN apk add --no-cache build-base
+FROM rust:1.90.0-slim-trixie AS builder
 WORKDIR /app
 COPY ./app .
 RUN cargo build --release
